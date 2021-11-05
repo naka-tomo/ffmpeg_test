@@ -14,3 +14,6 @@ ffmpegを使った動画編集についてよく使う機能をまとめまし�
 
 - 動画の上に別の動画をオーバーレイ[(code)](overlay_videos.py)  
 例：[元動画](https://github.com/naka-tomo/ffmpeg_test/raw/main/video.mp4)の上に[グラフ動画](https://github.com/naka-tomo/ffmpeg_test/raw/main/graph.mp4)を貼り付けた[動画](https://github.com/naka-tomo/ffmpeg_test/raw/main/overlay1.mp4)を生成
+
+- 複数の動画をタイル状に配置[(code)](tile_videos.py)  
+例：[複数の動画をタイル状に配置した動画](https://github.com/naka-tomo/ffmpeg_test/raw/main/tile.mp4)を生成
