@@ -9,28 +9,34 @@ def get_video_len( name ):
     count = video.get(cv2.CAP_PROP_FRAME_COUNT)
     fps = video.get(cv2.CAP_PROP_FPS)
     video.release()
-    return count/fps
+    return count/fps, fps
 
 def stack(input_vid1, input_vid2, axis, height, width, duration, out_vid ):
     if axis==0:
         stack = "vstack"
-        size = f"{width}:-1"
+        size = f"{width}:-2"
     elif axis==1:
         stack = "hstack"
-        size = f"-1:{height}"
+        size = f"-2:{height}"
 
-    ratio1 = duration/get_video_len(input_vid1)
-    ratio2 = duration/get_video_len(input_vid2)
+    len1, fps1 = get_video_len(input_vid1)
+    len2, fps2 = get_video_len(input_vid2)
+    print(len1, fps1)
+
+    ratio1 = duration/len1
+    ratio2 = duration/len2
+
+    sample_fps1 = min(fps1, max(30 * ratio1, 1))
+    sample_fps2 = min(fps2, max(30 * ratio2, 1))
+    print(sample_fps1, fps1, ratio1)
 
     com = f'ffmpeg -i {input_vid1} -i {input_vid2} -filter_complex "'
-    com += f"[0:v]setpts=PTS*{ratio1}, scale={size} [v0];"    # resize
-    com += f"[1:v]setpts=PTS*{ratio2}, scale={size} [v1];"    # resize
-    com += f'[v0][v1]{stack}" {out_vid}'
+    com += f"[0:v]fps={sample_fps1:.3f}, setpts=PTS*{ratio1}, scale={size}, trim=duration={duration},fps={30} [v0];"    # resize
+    com += f"[1:v]fps={sample_fps2:.3f}, setpts=PTS*{ratio2}, scale={size}, trim=duration={duration},fps={30} [v1];"    # resize
+    com += f'[v0][v1]{stack}" -c:v libx264 -pix_fmt yuv420p {out_vid}'
 
     print(com)
     os.system( com )
-
-
 
 input_video1 = "video.mp4" 
 input_video2 = "graph.mp4" 
